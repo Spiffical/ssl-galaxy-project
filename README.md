@@ -1,2 +1,2 @@
 # ssl-unions
-Self-supervised representation learning for self-similarity search of galaxies in the UNIONS Survey
+Self-supervised representation learning for finding ultra-faint dwarf galaxies, lensed galaxies, and other galaxies of interest, in the UNIONS Survey.
