@@ -64,13 +64,14 @@ collected_cfis_ids = []
 collected_ra = []
 collected_dec = []
 collected_tiles = []
+collected_idxes = []
 
 count = 0
 save_filenumber = 0
 
 for i in range(len(all_cutout_files)):
+    idx = all_cutout_files[i].split('.')[-3]
     if os.path.exists(saved_index_file):
-        idx = all_cutout_files[i].split('.')[-3]
         if idx in np.load(saved_index_file).astype(str):
             continue
     os.system('cp {} {}'.format(all_cutout_files[i], '$SLURM_TMPDIR'))
@@ -92,6 +93,7 @@ for i in range(len(all_cutout_files)):
                             collected_ra.append(f['ra'][k])
                             collected_dec.append(f['dec'][k])
                             collected_tiles.append(f['tile'][k])
+                            collected_idxes.append(idx)
                             count += 1
             else:
                 if len(keep_indices) > 0:
@@ -100,6 +102,7 @@ for i in range(len(all_cutout_files)):
                     collected_ra.extend(f['ra'][keep_indices])
                     collected_dec.extend(f['dec'][keep_indices])
                     collected_tiles.extend(f['tile'][keep_indices])
+                    collected_idxes.extend([idx]*len(keep_indices))
                     count += len(keep_indices)
 
     except Exception as e:
@@ -143,18 +146,19 @@ for i in range(len(all_cutout_files)):
         leftover_cfis_ids = collected_cfis_ids[num_cutout_stacks_per_file:]
         leftover_ra = collected_ra[num_cutout_stacks_per_file:]
         leftover_dec = collected_dec[num_cutout_stacks_per_file:]
+        leftover_idxes = collected_idxes[num_cutout_stacks_per_file:]
 
         # Keep track of which file IDs have been fully processed
         processed_indx_ids = []
-        for tile_id in np.unique(collected_tiles[:num_cutout_stacks_per_file]):
-            if tile_id not in leftover_tile_ids:
-                processed_tile_ids.append(tile_id)
-        if os.path.exists(saved_tileids_file):
-            np.save(saved_tileids_file,
-                    np.append(np.load(saved_tileids_file),
-                              processed_tile_ids))
+        for ind in np.unique(collected_idxes[:num_cutout_stacks_per_file]):
+            if ind not in leftover_idxes:
+                processed_indx_ids.append(ind)
+        if os.path.exists(saved_index_file):
+            np.save(saved_index_file,
+                    np.append(np.load(saved_index_file),
+                              processed_indx_ids))
         else:
-            np.save(saved_tileids_file, processed_tile_ids)
+            np.save(saved_index_file, processed_indx_ids)
 
         if count >= 1:
             collected_images = leftover_images

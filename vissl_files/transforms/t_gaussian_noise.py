@@ -58,9 +58,7 @@ class TensorGaussianNoise(ClassyTransform):
         img[2, :, :] += noise_cfis_lsb_r
         img[3, :, :] += noise_ps1_i
         img[4, :, :] += noise_ps1_z
-
         return img
-
 
     @classmethod
     def from_config(cls, config: Dict[str, Any]) -> "TensorGaussianNoise":

@@ -21,10 +21,15 @@ config:
         - name: ImgReplicatePil
           num_times: 2
         - name: ToTensor
+        - name: TensorReddening
+          shape: 0.39075997
+          loc: -0.02164
+          scale: 0.06739
         - name: RandomAffine
           translate: [0, 0.065]
           degrees: 180
           scale: [0.9, 1.1]
+          interpolation: "bilinear"
         - name: CenterCrop
           size: 140
         - name: RandomHorizontalFlip

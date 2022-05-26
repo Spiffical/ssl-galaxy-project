@@ -1,11 +1,10 @@
-from vissl.data.data_helper import get_mean_image
 from torch.utils.data import Dataset
-import torchvision.transforms.functional as F
-from PIL import Image
 import h5py
-import torch
 import glob
 import numpy as np
+from astropy.coordinates import SkyCoord
+from dustmaps.sfd import SFDQuery
+from astropy import units as u
 
 class Multih5DataSource(Dataset):
     """
@@ -68,12 +67,27 @@ class Multih5DataSource(Dataset):
         if not self.files[ifile]:
             self._open_file(ifile)
 
+        image = None
         try:
-            #with h5py.File(self.filenames[ifile], 'r') as _f:
+            # Retrieve data
             image = self.files[ifile]['images'][local_idx]
-            image = np.swapaxes(image, 0, 2)
+            ra = self.files[ifile]['ra'][local_idx]
+            dec = self.files[ifile]['dec'][local_idx]
+            image = np.swapaxes(image, 0, 2)  # Needs to be flipped for input to SimCLR
             image = np.float32(image)
-            #print(image.dtype)
+
+            # De-redden the image
+            coords = SkyCoord(ra=ra * u.degree, dec=dec * u.degree, frame='icrs')
+            sfd = SFDQuery()
+            sfd_ebv = sfd(coords)
+            # Taking conversion factors of sdss-u, sdss-g, sdss-r, ps-i, ps-z from:
+            # https://iopscience.iop.org/article/10.1088/0004-637X/737/2/103#apj398709t6
+            conversion_factor = np.array([4.239, 3.303, 2.285, 1.682, 1.322])
+            true_ext = conversion_factor * sfd_ebv
+            deredden_factor = 10. ** (true_ext / 2.5)
+            image = image * deredden_factor[None, None, :]
+            #image = np.float32([image[j, :, :] * deredden_factor[j] for j in range(5)])  # deredden
+
             is_success = True
         except Exception as e:
             print(e)
