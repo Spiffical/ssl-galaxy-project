@@ -94,7 +94,7 @@ def write_script(output_path, training_files, wrapper, config):
         writer.write('\n')
         for f in training_files:
             writer.write('cp {} {}\n'.format(f, '$SLURM_TMPDIR'))
-        writer.write('python /scratch/merileo/unions/append_slurmtmpdir_to_json.py')
+        writer.write('python /home/merileo/ssl-unions/vissl_files/append_slurmtmpdir_to_json.py')
         writer.write('\nbash {} config=pretrain/simclr/{}.yaml'.format(wrapper, config))
 
 

@@ -14,7 +14,7 @@ config:
     NUM_DATALOADER_WORKERS: 5
     TRAIN:
       DATA_SOURCES: [my_data_source]
-      DATASET_NAMES: [unions_200x200_ugriz_lsb]
+      DATASET_NAMES: [unions_200x200_ugriz_lsb_slurm]
       BATCHSIZE_PER_REPLICA: 64
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
@@ -29,7 +29,6 @@ config:
           translate: [0, 0.065]
           degrees: 180
           scale: [0.9, 1.1]
-          interpolation: "bilinear"
         - name: CenterCrop
           size: 140
         - name: RandomHorizontalFlip

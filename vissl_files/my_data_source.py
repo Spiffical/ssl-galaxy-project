@@ -85,7 +85,7 @@ class Multih5DataSource(Dataset):
             conversion_factor = np.array([4.239, 3.303, 2.285, 1.682, 1.322])
             true_ext = conversion_factor * sfd_ebv
             deredden_factor = 10. ** (true_ext / 2.5)
-            image = image * deredden_factor[None, None, :]
+            image = np.float32(image * deredden_factor[None, None, :])
             #image = np.float32([image[j, :, :] * deredden_factor[j] for j in range(5)])  # deredden
 
             is_success = True

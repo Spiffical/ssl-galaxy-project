@@ -31,11 +31,13 @@ class TensorReddening(ClassyTransform):
 
     def __call__(self, img):
 
-        sample_ebv = torch.tensor(lognorm.rvs(self.shape, self.loc, self.scale, size=1)[0])
+        sample_ebv = torch.tensor(lognorm.rvs(self.shape, self.loc, self.scale, size=1)[0],
+                                  dtype=torch.float32)
         #new_ebv = torch.FloatTensor(1).uniform_(0, self.max_ebv)
         # Taking conversion factors of sdss-u, sdss-g, sdss-r, ps-i, ps-z from:
         # https://iopscience.iop.org/article/10.1088/0004-637X/737/2/103#apj398709t6
-        conversion_factor = torch.tensor([4.239, 3.303, 2.285, 1.682, 1.322])
+        conversion_factor = torch.tensor([4.239, 3.303, 2.285, 1.682, 1.322],
+                                         dtype=torch.float32)
         reddening_factor = 10. ** (-conversion_factor * sample_ebv / 2.5)
         img = img * reddening_factor[:, None, None]
         return img
